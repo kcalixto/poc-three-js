@@ -1,7 +1,7 @@
 import { Text } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useRef, useState } from "react"
-import { BoxGeometry, Mesh } from "three"
+import { BoxGeometry, Mesh, TextureLoader } from "three"
 
 interface boxprops {
   title: string
@@ -21,7 +21,7 @@ export function Box(props: boxprops) {
 
   // Calculate the number of red blocks based on fillpct
   const redBlocksCount = Math.floor((props.fillpct / 100) * totalBoxes);
-  const blockColors = new Array(totalBoxes).fill("green");
+  const blockColors = new Array(totalBoxes).fill("lightgreen");
 
   // Randomly assign red color to some blocks
   for (let i = 0; i < redBlocksCount; i++) {
@@ -32,6 +32,9 @@ export function Box(props: boxprops) {
     blockColors[randomIndex] = "red";
   }
 
+  const texture = new TextureLoader().load('/src/cardbox.jpg');
+
+  // <meshStandardMaterial map={texture} roughness={1} />
   return (
     <group position={[props.x, props.y, props.z]} key={`${props.x}-${props.y}${props.z}`}>
       {
@@ -45,7 +48,7 @@ export function Box(props: boxprops) {
               lineIndex * -5, // Now lineIndex affects the y position
             ]} castShadow>
               <boxGeometry args={[4, 4, 4]} />
-              <meshStandardMaterial color={blockColors[index]} roughness={1} />
+              <meshStandardMaterial map={texture} color={blockColors[index]} roughness={1} />
               <Text position={[2.25, 0, 0]} fontSize={1} color="#CBD5E1" rotation={[0, Math.PI / 2, 0]}>
                 {`L${lineIndex}-P${posIndex}`}
               </Text>
@@ -92,6 +95,9 @@ export function Street(props: streetprops) {
     <group
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
+      onClick={() => {
+        window.location.href = `/rua?street=${props.streetid}`
+      }}
     >
       <lineSegments
         position={[props.x, props.y + 21, props.z - 13]}
@@ -110,7 +116,7 @@ export function Street(props: streetprops) {
           color={hovered ? "#FF0000" : "#94A3B8"}
         />
       </lineSegments>
-      <Text ref={textRef} position={[props.x, props.y + 18 + (7 * 4), -10]} fontSize={5} color="black">
+      <Text ref={textRef} position={[props.x, props.y + 18 + (7 * 4), props.z - 10]} fontSize={5} color="black">
         {`R${props.streetid}`}
       </Text>
       <Box x={props.x} y={props.y + 18 + 7 + 7} z={0} title={'teste'} numlines={4} numposperline={1} boxid={4} fillpct={3} />
